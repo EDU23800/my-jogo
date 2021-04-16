@@ -1,0 +1,59 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Meu joguinho multiplayer</title>
+    <style>
+        #screen{
+            border: 10px solid #CCC;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            image-rendering: -moz-crisp-edges;
+            width: 400px;
+            height: 400px;
+        }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <canvas id="screen" width="10px" height="10px" > </canvas>
+    
+    <script type="module">
+        import createGame from "./js/game.js"
+        import createKeyboardListener from "./js/keyboard-listener.js"
+        import renderScreen from "./js/render-screen.js"
+
+        const game = createGame( )
+        const keyboardListener = createKeyboardListener( document )
+        keyboardListener.subscribe( game.movePlayer ) 
+                
+        const socket = io()
+
+        socket.on( 'connect', () => {
+            const playerId = socket.id 
+            console.log( `>  Player connect with id: ${playerId}` )
+
+            const screen = document.getElementById( "screen" )
+            renderScreen( screen, game, requestAnimationFrame, playerId )
+        })
+
+        socket.on( "setup", ( state ) => {
+            const playerId = socket.id 
+            game.setState( state )
+
+            keyboardListener.registerPlayerId( playerId )
+            keyboardListener.subscribe( game.movePlayer )
+        } )
+
+        socket.on( "add-player", ( command ) => {
+            console.log( `> Receiving "add-player" event from server with id: ${command.playerId}` )
+            game.addPlayer( command )
+        } )
+
+        socket.on( "remove-player", ( command ) => {
+            console.log( `> Receiving "remove-player" event from server with id: ${command.playerId}` )
+            game.removePlayer( command )
+        } )
+
+    </script>
+</body>
+</html>

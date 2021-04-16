@@ -1,0 +1,18 @@
+{
+  "name": "my-jogo",
+  "version": "1.0.0",
+  "description": "Meu primeiro jogo multiplayer ",
+  "main": "server.js",
+  "type": "module",
+  "dependencies": {
+    "debug": "^2.6.9",
+    "express": "^4.17.1",
+    "socket.io": "^4.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Eduardo R. Vasconcelos <contato@duvasconcelos.com.br>",
+  "license": "ISC"
+}
