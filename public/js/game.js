@@ -9,6 +9,13 @@ export default function createGame( ){
         },
     }
     const observers = []
+
+    function start( seconds ) {
+        seconds = seconds || 4
+        const miliseconds = seconds * 1000
+        setInterval( addFruit, miliseconds )
+    }
+
     function subscribe( observerFunction ){
         observers.push( observerFunction )
     }
@@ -23,14 +30,11 @@ export default function createGame( ){
         Object.assign( state, newState )
     }
     function addPlayer( command ){
-        console.log( `Add recebido: x=${command.playerX}, y=${command.playerY} `  )
         
         const playerId = command.playerId
         const playerX = 'playerX' in command ? command.playerX : Math.floor( Math.random() * state.screen.width )
         const playerY = 'playerY' in command ? command.playerY : Math.floor( Math.random() * state.screen.height )
         
-        console.log( `Add gerado: x=${playerX}, y=${playerY} `  )
-
         state.players[playerId] = {
             x: playerX,
             y: playerY,
@@ -56,20 +60,34 @@ export default function createGame( ){
     }
     
     function addFruit( command ){
-        const fruitId = command.fruitId
-        const fruitX = command.fruitX
-        const fruitY = command.fruitY
+        command = command || {}
+
+        const fruitId = 'fruitId' in command ? command.fruitId : Math.floor( Math.random() * 1000000 )
+        const fruitX = 'fruitX' in command ? command.fruitX : Math.floor( Math.random() * state.screen.width )
+        const fruitY = 'fruitY' in command ? command.fruitY : Math.floor( Math.random() * state.screen.height )
         
         state.fruits[fruitId] = {
             x: fruitX,
             y: fruitY,
         }
+
+        notifyAll( {
+            type: 'add-fruit',
+            fruitId: fruitId,
+            fruitX: fruitX,
+            fruitY: fruitY
+        })
     }
     
     function removeFruit( command ) {
         const fruitId = command.fruitId
         
         delete state.fruits[fruitId]
+
+        notifyAll( {
+            type: 'remove-fruit',
+            fruitId: fruitId
+        })
     }
     
     function movePlayer ( command ){
@@ -135,6 +153,7 @@ export default function createGame( ){
         addFruit,
         removeFruit,
         setState,
-        subscribe
+        subscribe,
+        start
     }
 }

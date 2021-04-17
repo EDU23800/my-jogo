@@ -12,6 +12,7 @@ const sockets = new io.Server( server )
 app.use( express.static( "public" ) )
 
 const game = createGame()
+game.start()
 
 game.subscribe( (command) => {
     sockets.emit( command.type, command )
@@ -35,8 +36,9 @@ sockets.on( "connection", ( socket ) => {
     } )
 
     socket.emit( 'setup', game.state )
-    
+
 } )
+
 
 server.listen( 3000, () => {
     console.log( "# server is listening on port: 3000 ")

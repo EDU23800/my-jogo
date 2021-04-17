@@ -34,6 +34,12 @@
             renderScreen( screen, game, requestAnimationFrame, playerId )
         })
 
+        socket.on('disconnect', ( socket ) => {
+            console.log('Unsubscribing All')
+            socket.emit( "disconnect", socket )
+            keyboardListener.unsubscribeAll()
+        })
+        
         socket.on( "setup", ( state ) => {
             const playerId = socket.id 
             game.setState( state )
@@ -59,6 +65,15 @@
             if( playerId !== command.playerId ){
                 game.movePlayer( command )
             }
+        } )
+
+        socket.on( "add-fruit", ( command ) => {
+            console.log( `> Receiving "add-fruit" event from server with id: ${command.fruitId}` )
+            game.addFruit( command )
+        } )
+
+        socket.on( "remove-fruit", ( command ) => {
+            game.removeFruit( command )
         } )
 
     </script>
