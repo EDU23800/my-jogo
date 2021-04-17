@@ -23,10 +23,14 @@ export default function createGame( ){
         Object.assign( state, newState )
     }
     function addPlayer( command ){
+        console.log( `Add recebido: x=${command.playerX}, y=${command.playerY} `  )
+        
         const playerId = command.playerId
         const playerX = 'playerX' in command ? command.playerX : Math.floor( Math.random() * state.screen.width )
-        const playerY = 'playerY' in command ? command.playerX : Math.floor( Math.random() * state.screen.height )
+        const playerY = 'playerY' in command ? command.playerY : Math.floor( Math.random() * state.screen.height )
         
+        console.log( `Add gerado: x=${playerX}, y=${playerY} `  )
+
         state.players[playerId] = {
             x: playerX,
             y: playerY,
@@ -69,7 +73,8 @@ export default function createGame( ){
     }
     
     function movePlayer ( command ){
-         
+        notifyAll( command )
+
         const acceptedMoves = {
             ArrowUp( player ){
                 if( player.y - 1 >= 0 ){
@@ -100,9 +105,9 @@ export default function createGame( ){
             
         }
         const keyPressed = command.keyPressed
-        const player = state.players[command.playerId]
-        const moveFunction = acceptedMoves[keyPressed]
         const playerId = command.playerId
+        const player = state.players[playerId]
+        const moveFunction = acceptedMoves[keyPressed]
         
         if( player && moveFunction ) {
             moveFunction( player )
@@ -118,7 +123,6 @@ export default function createGame( ){
             const fruit = state.fruits[fruitId]
             
             if( player.x === fruit.x && player.y === fruit.y ){
-                console.log( `game.checkFruitCollition() -> COLLISION between ${playerId} and ${fruitId}` );
                 removeFruit( { fruitId : fruitId } )
             }
         }

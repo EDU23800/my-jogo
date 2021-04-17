@@ -24,15 +24,13 @@
 
         const game = createGame( )
         const keyboardListener = createKeyboardListener( document )
-        keyboardListener.subscribe( game.movePlayer ) 
-                
         const socket = io()
 
         socket.on( 'connect', () => {
             const playerId = socket.id 
-            console.log( `>  Player connect with id: ${playerId}` )
-
             const screen = document.getElementById( "screen" )
+
+            console.log( `connnecting ${playerId}`)
             renderScreen( screen, game, requestAnimationFrame, playerId )
         })
 
@@ -42,6 +40,9 @@
 
             keyboardListener.registerPlayerId( playerId )
             keyboardListener.subscribe( game.movePlayer )
+            keyboardListener.subscribe( ( command ) => {
+                socket.emit( "move-player", command )
+            })
         } )
 
         socket.on( "add-player", ( command ) => {
@@ -50,8 +51,14 @@
         } )
 
         socket.on( "remove-player", ( command ) => {
-            console.log( `> Receiving "remove-player" event from server with id: ${command.playerId}` )
             game.removePlayer( command )
+        } )
+
+        socket.on( "move-player", ( command ) => {
+            const playerId = socket.id
+            if( playerId !== command.playerId ){
+                game.movePlayer( command )
+            }
         } )
 
     </script>
