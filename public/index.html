@@ -36,7 +36,6 @@
 
         socket.on('disconnect', ( socket ) => {
             console.log('Unsubscribing All')
-            socket.emit( "disconnect", socket )
             keyboardListener.unsubscribeAll()
         })
         

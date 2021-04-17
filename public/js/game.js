@@ -9,11 +9,20 @@ export default function createGame( ){
         },
     }
     const observers = []
+    
+    let intervalId = null;
 
     function start( seconds ) {
-        seconds = seconds || 4
+        seconds = seconds || 1
         const miliseconds = seconds * 1000
-        setInterval( addFruit, miliseconds )
+
+        intervalId = setInterval( addFruit, miliseconds )
+
+    }
+
+    function stop( ) {
+        clearInterval( intervalId )
+        intervalId = null
     }
 
     function subscribe( observerFunction ){
@@ -65,6 +74,14 @@ export default function createGame( ){
         const fruitId = 'fruitId' in command ? command.fruitId : Math.floor( Math.random() * 1000000 )
         const fruitX = 'fruitX' in command ? command.fruitX : Math.floor( Math.random() * state.screen.width )
         const fruitY = 'fruitY' in command ? command.fruitY : Math.floor( Math.random() * state.screen.height )
+        
+        for( const checkFruitId in state.fruits ){
+            const fruit = state.fruits[checkFruitId]
+            if( fruit && fruitX === fruit.x && fruitY === fruit.y ){
+                addFruit( {fruitId: fruitId} )
+                return
+            }
+        }
         
         state.fruits[fruitId] = {
             x: fruitX,
@@ -119,7 +136,7 @@ export default function createGame( ){
                     return 
                 }
                 
-            }       
+            },
             
         }
         const keyPressed = command.keyPressed
@@ -154,6 +171,7 @@ export default function createGame( ){
         removeFruit,
         setState,
         subscribe,
-        start
+        start,
+        stop
     }
 }
