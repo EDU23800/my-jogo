@@ -1,28 +1,24 @@
-export default function createGame( ){
-    
+export default function createGame( largura, altura ){
+    altura = altura || 10 
+    largura = largura || 10 
     const state = {
         players:{ } ,
         fruits: { },
         screen: {
-            width: 10,
-            height: 10
+            width: largura,
+            height: altura
         },
+        frequenceSeconds : 5,
+        startedFruits : false
     }
+
     const observers = []
-    
-    let intervalId = null;
 
     function start( seconds ) {
-        seconds = seconds || 1
-        const miliseconds = seconds * 1000
+        state.frequenceSeconds = seconds || state.frequenceSeconds
+        const miliseconds = state.frequenceSeconds * 1000
 
-        intervalId = setInterval( addFruit, miliseconds )
-
-    }
-
-    function stop( ) {
-        clearInterval( intervalId )
-        intervalId = null
+        setInterval( addFruit, miliseconds )
     }
 
     function subscribe( observerFunction ){
@@ -70,7 +66,11 @@ export default function createGame( ){
     
     function addFruit( command ){
         command = command || {}
+        const recursive = 'recursive' in command ? command.recursive : 0
 
+        // Se em 50 tentativas ele não achar espaço, não add nenhum fruta
+        if( ! state.startedFruits || recursive >= 50 ) return
+        
         const fruitId = 'fruitId' in command ? command.fruitId : Math.floor( Math.random() * 1000000 )
         const fruitX = 'fruitX' in command ? command.fruitX : Math.floor( Math.random() * state.screen.width )
         const fruitY = 'fruitY' in command ? command.fruitY : Math.floor( Math.random() * state.screen.height )
@@ -78,7 +78,7 @@ export default function createGame( ){
         for( const checkFruitId in state.fruits ){
             const fruit = state.fruits[checkFruitId]
             if( fruit && fruitX === fruit.x && fruitY === fruit.y ){
-                addFruit( {fruitId: fruitId} )
+                addFruit( {fruitId: fruitId, recursive: recursive + 1 } )
                 return
             }
         }
@@ -134,9 +134,14 @@ export default function createGame( ){
                 if( player.x - 1 >= 0 ){
                     player.x -= 1
                     return 
-                }
-                
+                }   
             },
+
+            Delete( ){
+                state.startedFruits = ! state.startedFruits
+                console.log( `state fruit: ${state.startedFruits}`)
+                return
+            }
             
         }
         const keyPressed = command.keyPressed
@@ -171,7 +176,6 @@ export default function createGame( ){
         removeFruit,
         setState,
         subscribe,
-        start,
-        stop
+        start
     }
 }

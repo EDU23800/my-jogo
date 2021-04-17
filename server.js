@@ -1,8 +1,8 @@
-import { create } from 'domain'
 import express from 'express'
 import http from 'http'
 import createGame from "./public/js/game.js"
 import * as io from "socket.io"
+import dotenv from 'dotenv'
 
 
 const app = express()
@@ -11,8 +11,8 @@ const sockets = new io.Server( server )
 
 app.use( express.static( "public" ) )
 
-const game = createGame()
-game.start()
+const game = createGame( 10, 10 )
+game.start( )
 
 game.subscribe( (command) => {
     sockets.emit( command.type, command )
@@ -39,7 +39,10 @@ sockets.on( "connection", ( socket ) => {
 
 } )
 
+const config = dotenv.config( "port" )
+const port = config.parsed?.PORT || 4003 
 
-server.listen( 3000, () => {
-    console.log( "# server is listening on port: 3000 ")
+
+server.listen( port, () => {
+    console.log( `# server is listening on port: ${port} `)
 })

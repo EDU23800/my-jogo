@@ -4,18 +4,17 @@
     <title>Meu joguinho multiplayer</title>
     <style>
         #screen{
-            border: 10px solid #CCC;
+            border: 10px solid #c9c9c9;
             image-rendering: pixelated;
             image-rendering: crisp-edges;
             image-rendering: -moz-crisp-edges;
-            width: 400px;
-            height: 400px;
+            height: 50%;
         }
     </style>
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-    <canvas id="screen" width="10px" height="10px" > </canvas>
+    <canvas id="screen"> </canvas>
     
     <script type="module">
         import createGame from "./js/game.js"
@@ -28,10 +27,7 @@
 
         socket.on( 'connect', () => {
             const playerId = socket.id 
-            const screen = document.getElementById( "screen" )
-
             console.log( `connnecting ${playerId}`)
-            renderScreen( screen, game, requestAnimationFrame, playerId )
         })
 
         socket.on('disconnect', ( socket ) => {
@@ -42,6 +38,11 @@
         socket.on( "setup", ( state ) => {
             const playerId = socket.id 
             game.setState( state )
+
+            const screen = document.getElementById( "screen" )
+            screen.height = state.screen.height
+            screen.width = state.screen.width
+            renderScreen( screen, game, requestAnimationFrame, playerId )
 
             keyboardListener.registerPlayerId( playerId )
             keyboardListener.subscribe( game.movePlayer )
