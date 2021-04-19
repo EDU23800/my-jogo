@@ -1,4 +1,4 @@
-export default function renderScreen( screen, game, requestAnimationFrame, currentPlayerId ){
+export default function renderScreen( screen, scoreTableHtml, game, requestAnimationFrame, currentPlayerId ){
             
     const context = screen.getContext( "2d" )
     context.clearRect( 0, 0, screen.width, screen.height )
@@ -20,7 +20,47 @@ export default function renderScreen( screen, game, requestAnimationFrame, curre
         context.fillStyle = "#F0DB4F"
         context.fillRect( currentPlayer.x, currentPlayer.y, 1, 1 )
     }
+
+    updateScore( scoreTableHtml, game, currentPlayerId )
     requestAnimationFrame( () => {
-        renderScreen( screen, game, requestAnimationFrame, currentPlayerId )
+        renderScreen( screen, scoreTableHtml, game, requestAnimationFrame, currentPlayerId )
     } )
+}
+
+function updateScore( scoreTableHtml,game, currentPlayerId ){
+    let innerHmtlScore = `
+        <thead>
+            <tr>
+                <td>User</td>
+                <td>Pontuação</td>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+
+    const sortable = Object.entries( game.state.players ).sort(function (a, b) {
+        debugger
+        if (a[1]['pontos'] < b[1]['pontos']) {
+            return 1;
+        }
+        if (a[1]['pontos'] > b[1]['pontos']) {
+            return -1;
+        }
+        // a must be equal to b
+        return 0;
+    });
+
+    for (let index = 0; index < sortable.length; index++) {
+        const item = sortable[index]
+        const playerId = item[0];
+        const pontos = item[1]['pontos'];
+        
+        innerHmtlScore += `
+        <tr class="${playerId === currentPlayerId ? "current": "another"} player">
+            <td>${playerId}</td>
+            <td>${pontos}</td>
+        </tr>`   
+    }
+
+    scoreTableHtml.innerHTML = `${innerHmtlScore}\n</tbody>`
 }

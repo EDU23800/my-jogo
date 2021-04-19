@@ -2,20 +2,35 @@
 <head>
     <meta charset="UTF-8">
     <title>Meu joguinho multiplayer</title>
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
     <style>
+        body{
+            overflow-x: hidden;
+        }
+
+        .current.player{
+            color: #b7a52f
+        }
         #screen{
             border: 10px solid #c9c9c9;
             image-rendering: pixelated;
             image-rendering: crisp-edges;
             image-rendering: -moz-crisp-edges;
-            height: 50%;
+            width: 400px;
         }
     </style>
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-    <canvas id="screen"> </canvas>
-    
+    <div class="row">
+        <div class="col-lg-5">
+            <canvas id="screen"> </canvas>
+        </div>
+        <div class="col-lg-6">
+            <h1>Pontuação dos jogadores</h1>
+            <table id="score-table" class="table"></table>
+        </div>
+    </div>    
     <script type="module">
         import createGame from "./js/game.js"
         import createKeyboardListener from "./js/keyboard-listener.js"
@@ -40,9 +55,12 @@
             game.setState( state )
 
             const screen = document.getElementById( "screen" )
+            const scoreTableHtml = document.getElementById( "score-table" )
+            
             screen.height = state.screen.height
             screen.width = state.screen.width
-            renderScreen( screen, game, requestAnimationFrame, playerId )
+            
+            renderScreen( screen, scoreTableHtml, game, requestAnimationFrame, playerId )
 
             keyboardListener.registerPlayerId( playerId )
             keyboardListener.subscribe( game.movePlayer )

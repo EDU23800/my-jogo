@@ -37,19 +37,21 @@ export default function createGame( largura, altura ){
     function addPlayer( command ){
         
         const playerId = command.playerId
-        const playerX = 'playerX' in command ? command.playerX : Math.floor( Math.random() * state.screen.width )
-        const playerY = 'playerY' in command ? command.playerY : Math.floor( Math.random() * state.screen.height )
-        
-        state.players[playerId] = {
+        const playerX = 'x' in command ? command.x : Math.floor( Math.random() * state.screen.width )
+        const playerY = 'y' in command ? command.y : Math.floor( Math.random() * state.screen.height )
+        const pontos = 'pontos' in command ? command.pontos : 0
+        const player = {
             x: playerX,
             y: playerY,
+            pontos: pontos
         }
+
+        state.players[playerId] = player
 
         notifyAll( {
             type: 'add-player',
             playerId: playerId,
-            playerX: playerX,
-            playerY: playerY
+            ...player
         })
     }
     
@@ -72,8 +74,8 @@ export default function createGame( largura, altura ){
         if( ! state.startedFruits || recursive >= 50 ) return
         
         const fruitId = 'fruitId' in command ? command.fruitId : Math.floor( Math.random() * 1000000 )
-        const fruitX = 'fruitX' in command ? command.fruitX : Math.floor( Math.random() * state.screen.width )
-        const fruitY = 'fruitY' in command ? command.fruitY : Math.floor( Math.random() * state.screen.height )
+        const fruitX = 'x' in command ? command.x : Math.floor( Math.random() * state.screen.width )
+        const fruitY = 'y' in command ? command.y : Math.floor( Math.random() * state.screen.height )
         
         for( const checkFruitId in state.fruits ){
             const fruit = state.fruits[checkFruitId]
@@ -83,16 +85,16 @@ export default function createGame( largura, altura ){
             }
         }
         
-        state.fruits[fruitId] = {
+        const fruit = {
             x: fruitX,
             y: fruitY,
         }
+        state.fruits[fruitId] = fruit
 
         notifyAll( {
             type: 'add-fruit',
             fruitId: fruitId,
-            fruitX: fruitX,
-            fruitY: fruitY
+            ...fruit
         })
     }
     
@@ -163,6 +165,7 @@ export default function createGame( largura, altura ){
             const fruit = state.fruits[fruitId]
             
             if( player.x === fruit.x && player.y === fruit.y ){
+                state.players[playerId].pontos ++
                 removeFruit( { fruitId : fruitId } )
             }
         }
